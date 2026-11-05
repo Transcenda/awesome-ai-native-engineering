@@ -28,13 +28,13 @@ Use the agent to learn how the product works from its code. Ask questions such a
 
 Stop steering the agent step by step. Give it the outcome, the acceptance criteria, and the checks it can run on its own: build, lint, tests, and a script that compares the result with the spec. The agent then changes code, runs the checks, reads the failures, fixes, and repeats until the checks pass or it reaches an iteration limit. Put build, lint, and tests behind one command that finishes in minutes and gives the same result every run. Review the final diff for edits to tests, snapshots, and check configuration, since an agent that cannot make a check pass sometimes changes the check.
 
-**In practice:** you hand the agent a task with the outcome and the checks it must pass, it finishes without prompts between steps, and the final diff has no unreviewed changes to tests, snapshots, or check configuration.
+**In practice:** the repo has one command that runs build, lint, and tests, the agent config sets an iteration limit, and a merged PR shows the task brief with its checks and a session with no manual steps between the brief and the final diff.
 
 ### 3. Automated Verification
 
 Code review and QA testing become the bottleneck once agents write most of the code. Automate the review in layers. Deterministic checks first: CI the agent cannot edit, static analysis, contract and E2E tests, branch protection. Then agent-based checks by a context that did not write the code: a review of the diff against the spec (#5), validation against the reference architecture and ADRs (#6), and a check that the automated tests cover the requirements (#14). Record what each layer catches. The goal is a verification setup you trust enough to release to production without a human in the loop.
 
-**In practice:** every agent diff passes CI the agent cannot edit, an architecture and ADR check, and a spec-and-tests review by a context that did not write it, and you can name defects each layer caught in work the agent reported as done.
+**In practice:** branch protection and CI config the agent cannot edit, a configured architecture and ADR check and a spec review by a context that did not write the code, and a log of defects each layer caught in work the agent reported as done.
 
 ### 4. Maintenance Automation
 
@@ -72,7 +72,7 @@ Instructions checked into the repo give every agent the same starting context. K
 
 ### 9. Agent Memory
 
-Agents repeat the same wrong command or miss the same convention in the next session. When a lesson holds, put it where every agent re-reads it: the repo instructions, a Skill, or shared agent memory, and delete it when it stops applying. Session retros (#24) find these lessons. [Headroom's `learn`](https://github.com/headroomlabs-ai/headroom) and [GitHub Copilot Memory](https://docs.github.com/en/copilot/concepts/agents/copilot-memory) help capture them.
+Agent memory is what an agent carries from one session to the next. Without it, agents repeat the same wrong command or miss the same convention. When a lesson holds, put it where every agent re-reads it: the repo instructions, a Skill, or shared agent memory, and delete it when it stops applying. Session retros (#24) find these lessons. [Headroom's `learn`](https://github.com/headroomlabs-ai/headroom) and [GitHub Copilot Memory](https://docs.github.com/en/copilot/concepts/agents/copilot-memory) help capture them.
 
 **In practice:** after a failed task or a review correction, you've saved a reusable lesson in AGENTS.md, CLAUDE.md, a Skill, or agent memory, and a later task used it.
 
@@ -98,7 +98,7 @@ MCP connects an agent to data and external systems through an open standard. A C
 
 Give the agent access to the actual logs, traces, CI output, and database schemas so it troubleshoots from evidence. Make that access scoped and read-only or throwaway by default, strip secrets and personal data before they reach the model, and keep production writes and migrations behind an explicit approval. Sentry and Grafana expose telemetry to agents; DBHub gives scoped database access.
 
-**In practice:** you've troubleshot from real logs, traces, or snapshots with scoped read-only access, or explored a schema and drafted a query or migration, and reviewed and tested any change that writes data separately.
+**In practice:** a scoped read-only credential or MCP server config for logs, traces, and the database, and a resolved incident or merged fix where the agent's diagnosis cites the actual log or trace.
 
 ## Testing and Quality Engineering
 
@@ -106,13 +106,13 @@ Give the agent access to the actual logs, traces, CI output, and database schema
 
 More agent-written code means more defects unless the tests grow with it. Have agents write unit, integration, contract, and E2E tests. Write them from the requirements and observed behavior, never from the code the agent just wrote, because a test that mirrors the implementation hides the same bug. Harden them with mutation testing, and use fake or masked data only.
 
-**In practice:** an agent wrote or improved more than one kind of test in a shipped PR, generated the fixtures, and you've shown the tests can fail, with a mutation run or a deliberate bug they caught.
+**In practice:** a merged PR with tests that name the requirement or spec they cover, fixtures generated by the agent, and a mutation testing report or a recorded bug those tests caught.
 
 ### 15. Browser and Device Verification
 
 When an agent changes a UI, have it check the result in the running app. Give it Playwright MCP, Chrome DevTools MCP, or a simulator so it clicks through the flow and reads console and network errors before it reports the task as done. Turn checks worth repeating into Playwright or Maestro scripts in CI. Use vision-based computer control only where no DOM or accessibility API is available.
 
-**In practice:** the agent verifies its own UI changes in a real browser or simulator before it says done, and the repeatable checks run as Playwright or Maestro scripts in CI.
+**In practice:** Playwright MCP, Chrome DevTools MCP, or a simulator in the agent config, a PR whose agent run includes browser screenshots or traces, and Playwright or Maestro scripts in CI.
 
 ### 16. Agent Evals
 
@@ -150,7 +150,7 @@ Reviewing every run stops scaling beyond a few parallel agents. A lead agent spl
 
 ### 21. Token Economics
 
-The model recalls less as the context window fills, so choose what it sees. Keep instructions short and the toolset small, fetch information only when needed, filter command output, and use prompt caching and model routing. Optimize for task success per token, know your budget, and watch usage per tool, since parallel agents multiply spend. Compression tools like Headroom and RTK help, but check task quality as well as token savings.
+Tokens are the cost unit of agent work, and a full context window also lowers recall, so choose what the model sees and what it costs. Keep instructions short and the toolset small, fetch information only when needed, filter command output, and use prompt caching and model routing. Optimize for task success per token, know your budget, and watch usage per tool, since parallel agents multiply spend. Compression tools like Headroom and RTK help, but check task quality as well as token savings.
 
 **In practice:** you've measured cost, latency, and success before and after a context change, you know your budget and where to see usage per tool, and you can show the change did not lower task success or remove information the agent needed.
 
