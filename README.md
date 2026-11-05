@@ -22,7 +22,7 @@ This roadmap helps engineering teams build their agent harness step by step, fro
 
 Use the agent to learn how the product works from its code. Ask questions such as "How does feature X work?", "What is component Y for?", or "Which services handle a checkout request?". It can also map the repo, summarize the tech stack, and draw component diagrams.
 
-**In practice:** your AI agents can answer the questions about the architecture, components breakdown, and key workflows.
+**In practice:** a repository map, tech stack summary, or component diagram the agent generated from the code, and a saved session where it answered questions about the architecture, component breakdown, and key workflows.
 
 ### 2. Agentic Loop
 
