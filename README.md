@@ -6,8 +6,8 @@ This roadmap helps engineering teams build their agent harness step by step, fro
 
 ## Contents
 
-- [Working with AI agents](#working-with-ai-agents)
-- [Spec-first work](#spec-first-work)
+- [AI Agents Fundamentals](#ai-agents-fundamentals)
+- [Specifications and Knowledge Management](#specifications-and-knowledge-management)
 - [Agent instructions, Skills, and tools](#agent-instructions-skills-and-tools)
 - [Testing and quality engineering](#testing-and-quality-engineering)
 - [Parallel agents and autonomous execution](#parallel-agents-and-autonomous-execution)
@@ -16,51 +16,51 @@ This roadmap helps engineering teams build their agent harness step by step, fro
 - [Agentic AI Toolbox](#agentic-ai-toolbox)
 
 
-## Working with AI agents
+## AI Agents Fundamentals
 
-### 1. Product exploration
+### 1. Product Exploration
 
 Use the agent to learn how the product works from its code. Ask questions such as "How does feature X work?", "What is component Y for?", or "Which services handle a checkout request?". It can also map the repo, summarize the tech stack, and draw component diagrams.
 
 **In practice:** your AI agents can answer the questions about the architecture, components breakdown, and key workflows.
 
-### 2. Changes that pass build and tests before review
+### 2. Agentic Loop
 
-Let the agent run its own loop: change code, build, run static analysis and tests, read the failures, fix, repeat. Put build, lint, and tests behind one command that finishes in minutes and gives the same result every run. Set an iteration limit and review the final diff for edits to tests, snapshots, and check configuration, since an agent that cannot make a check pass sometimes changes the check.
+Stop steering the agent step by step. Give it the outcome, the acceptance criteria, and the checks it can run on its own: build, lint, tests, and a script that compares the result with the spec. The agent then changes code, runs the checks, reads the failures, fixes, and repeats until the checks pass or it reaches an iteration limit. Put build, lint, and tests behind one command that finishes in minutes and gives the same result every run. Review the final diff for edits to tests, snapshots, and check configuration, since an agent that cannot make a check pass sometimes changes the check.
 
-**In practice:** build, lint, and tests run with one command in minutes, the agent loops on them with a set limit, and the final diff has no unreviewed changes to tests, snapshots, or check configuration.
+**In practice:** you hand the agent a task with the outcome and the checks it must pass, it finishes without prompts between steps, and the final diff has no unreviewed changes to tests, snapshots, or check configuration.
 
-### 3. Independent AI review before human review
+### 3. Automated Verification
 
-An agent tends to approve its own code. Before a human reads a diff, have a context that did not write it review the diff against the spec: a reviewer sub-agent, a second agent, or a PR bot such as CodeRabbit or Greptile. Use required CI checks and branch protection so the agent cannot merge on its own.
+Code review and QA testing become the bottleneck once agents write most of the code. Automate the review in layers. Deterministic checks first: CI the agent cannot edit, static analysis, contract and E2E tests, branch protection. Then agent-based checks by a context that did not write the code: a review of the diff against the spec (#5), validation against the reference architecture and ADRs (#6), and a check that the automated tests cover the requirements (#14). Record what each layer catches. The goal is a verification setup you trust enough to release to production without a human in the loop.
 
-**In practice:** before a human sees it, every agent diff passes CI that the agent cannot edit and a review against the spec by a context that didn't write it, and this review has caught at least one defect in a task the agent reported as done.
+**In practice:** every agent diff passes CI the agent cannot edit, an architecture and ADR check, and a spec-and-tests review by a context that did not write it, and you can name defects each layer caught in work the agent reported as done.
 
-### 4. Continuous refactoring and cleanup
+### 4. Maintenance Automation
 
-Agents add code quickly and rarely refactor unless asked, so plan cleanup explicitly. Include the cleanup a change exposed in the same PR, and run a scheduled agent that opens small cleanup PRs (#19). For structural changes across the repo, use codemod tools like ast-grep, GritQL, jscodeshift, and Comby, and let the tests verify the result.
+Agents add code fast and do not clean up unless asked. Keep a technical debt backlog that agents work from. Measure the codebase with code analysis and code graph tools, and let an agent turn the findings into backlog items. Run a scheduled agent (#19) that opens small refactoring PRs from the backlog, and use codemods such as ast-grep, GritQL, jscodeshift, and Comby for structural changes. Treat framework and dependency migrations the same way: Renovate or Dependabot flags the version, the agent reads the changelog, updates the call sites, and runs the tests (#27).
 
-**In practice:** you've merged agent-written cleanup such as a refactor, dead code removal, or consolidated duplicate code, and a scheduled agent opens small cleanup PRs.
+**In practice:** you have a technical debt backlog fed by codebase analysis, a scheduled agent opens refactoring and migration PRs from it, and you've merged more than one.
 
-## Spec-first work
+## Specifications and Knowledge Management
 
-### 5. Approved plan before code changes
+### 5. Specification-Driven Development
 
-For anything non-trivial, the agent proposes a plan with acceptance criteria and edits nothing until you approve it. Change the plan when the code, tool output, or tests show something new. For anyone who builds without reading the code, the approved plan is the contract.
+The spec is the main artifact a human writes. For a feature it covers the happy path, error and edge cases, acceptance criteria, and the design decisions with the options considered. For a single task the agent derives a plan with acceptance criteria from the spec and edits nothing until you approve it. Update the spec when the code or tests prove the design wrong. Spec Kit, Kiro, Tessl, and BMAD-METHOD give this a repeatable flow.
 
-**In practice:** you approved a plan with acceptance criteria before the agent edited code, updated it after feedback from the repo or tests, and the final diff stayed small enough to review in one pass.
+**In practice:** you've written a spec with the happy path, error cases, acceptance criteria, and design decisions, agents take it as input, and for each task they propose a plan you approve before they edit code.
 
-### 6. Specs as the source of truth for agents
+### 6. Architecture Governance
 
-The spec is the main artifact a human writes. Cover the happy path, error and edge cases, acceptance criteria, and the design decisions: data model, API boundaries, options considered and why one was chosen. Update the spec when the implementation proves the design wrong. Spec Kit, Kiro, Tessl, and BMAD-METHOD give this a repeatable flow.
+Write down the rules the code must follow: a reference architecture, coding standards, and an ADR for every non-trivial decision. Keep them in the repo, where agents read them before a change and verification checks against them (#3). Have the agent update the ADR in the same PR as the change, and flag rules the code no longer follows on a schedule (#19).
 
-**In practice:** you've written a spec in Markdown with the happy path, error cases, acceptance criteria, and design decisions with their trade-offs, and given it to agents as input.
+**In practice:** the repo holds a reference architecture and ADRs, agents cite them in plans, and at least one agent diff was rejected by a check against them.
 
-### 7. Documentation and ADRs that stay current
+### 7. Project Knowledge Base
 
-Agents read the docs as context before they change the code, and DORA lists [AI-accessible internal documentation](https://dora.dev/ai/roi/report/) as one of the foundations for a return on AI. Have the agent update READMEs, API references, and onboarding guides in the same PR as the change, write an ADR for every non-trivial decision, and flag stale docs on a schedule (#19).
+Agents drift from the product when they lack context: the vision, the current priorities, the decisions already made, and the requirements of the feature they are touching. Keep that in one knowledge base the agent can search: product vision and roadmap, feature specs (#5), ADRs (#6), API references, and onboarding guides. Link it from the agent instructions (#8) and expose it over MCP (#12) when it lives outside the repo. Have the agent update the docs in the same PR as the change, and flag stale pages on a schedule (#19). DORA lists [AI-accessible internal documentation](https://dora.dev/ai/roi/report/) as a foundation for return on AI.
 
-**In practice:** you've written or updated a README, API reference, onboarding note, or ADR with an agent in the same PR as the change, and kept it current.
+**In practice:** your agents answer "why was this built this way" and "what is the priority for this feature" from the knowledge base, docs change in the same PR as the code, and a scheduled check flags stale pages.
 
 ## Agent instructions, Skills, and tools
 
