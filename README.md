@@ -44,11 +44,11 @@ Agents add code fast and do not clean up unless asked. Keep a technical debt bac
 
 ## Specifications and Knowledge Management
 
-### 5. Specification-Driven Development
+### 5. Spec-Driven Development
 
-The spec is the main artifact a human writes. For a feature it covers the happy path, error and edge cases, acceptance criteria, and the design decisions with the options considered. For a single task the agent derives a plan with acceptance criteria from the spec and edits nothing until you approve it. Update the spec when the code or tests prove the design wrong. Spec Kit, Kiro, Tessl, and BMAD-METHOD give this a repeatable flow.
+The spec is the source of truth: a Markdown file that humans and agents evolve together, and the code follows it. For a feature it covers the happy path, error and edge cases, acceptance criteria, and the design decisions with the options considered. Keep it short and let it grow with the work, since an exhaustive design document slows delivery more than it helps. Agents keep nothing between sessions and lose track as the context fills, so load the spec at the start of every session to anchor the output. For a single task the agent derives a plan with acceptance criteria from the spec and edits nothing until you approve it. Update the spec when the code or tests prove the design wrong. Spec Kit, Kiro, Tessl, and BMAD-METHOD give this a repeatable flow.
 
-**In practice:** you've written a spec with the happy path, error cases, acceptance criteria, and design decisions, agents take it as input, and for each task they propose a plan you approve before they edit code.
+**In practice:** a Markdown spec in the repo with the happy path, error cases, acceptance criteria, and design decisions, a commit history that shows it changed with the code, an agent instruction that loads it at session start, and an approved plan the agent derived from it before editing.
 
 ### 6. Architecture Governance
 
