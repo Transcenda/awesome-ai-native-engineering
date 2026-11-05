@@ -2,7 +2,7 @@
 
 <!--lint disable double-link-->
 
-This roadmap helps engineering teams build their agent harness step by step, from exploring a product and writing specs to running fleets of parallel agents and improving the harness with session retros. The Agentic AI Toolbox at the end lists tools by category.
+This roadmap helps engineering teams build an efficient work process with AI agents. Each item describes one practice, from product exploration and specs to automated verification, parallel agents, harness engineering, and security. The In practice line under each item lists what a team has in place when it follows the practice, so a team can assess its maturity against the whole list. The Agentic AI Toolbox at the end lists tools by category.
 
 ## Contents
 
