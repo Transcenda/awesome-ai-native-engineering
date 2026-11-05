@@ -12,7 +12,7 @@ This roadmap helps engineering teams build their agent harness step by step, fro
 - [Testing and Quality Engineering](#testing-and-quality-engineering)
 - [Parallel Agents and Autonomous Execution](#parallel-agents-and-autonomous-execution)
 - [Harness and Context Engineering](#harness-and-context-engineering)
-- [Security, Maintenance, and Policy](#security-maintenance-and-policy)
+- [Security and Policy](#security-and-policy)
 - [Agentic AI Toolbox](#agentic-ai-toolbox)
 
 
@@ -38,9 +38,9 @@ Code review and QA testing become the bottleneck once agents write most of the c
 
 ### 4. Maintenance Automation
 
-Agents add code fast and do not clean up unless asked. Keep a technical debt backlog that agents work from. Measure the codebase with code analysis and code graph tools, and let an agent turn the findings into backlog items. Run a scheduled agent (#19) that opens small refactoring PRs from the backlog, and use codemods such as ast-grep, GritQL, jscodeshift, and Comby for structural changes. Treat framework and dependency migrations the same way: Renovate or Dependabot flags the version, the agent reads the changelog, updates the call sites, and runs the tests (#27).
+Agents add code fast and do not clean up unless asked. Keep a technical debt backlog that agents work from. Measure the codebase with code analysis and code graph tools, and let an agent turn the findings into backlog items. Run a scheduled agent (#19) that opens small refactoring PRs from the backlog, and use codemods such as ast-grep, GritQL, jscodeshift, and Comby for structural changes. Treat framework upgrades, dependency migrations, and security patches the same way: Renovate, Dependabot, or Snyk opens the PR, the agent reads the changelog, updates the call sites, and runs the tests, and a human reviews the draft.
 
-**In practice:** you have a technical debt backlog fed by codebase analysis, a scheduled agent opens refactoring and migration PRs from it, and you've merged more than one.
+**In practice:** you have a technical debt backlog fed by codebase analysis, a scheduled agent opens refactoring, upgrade, and security-patch PRs from it, and you've merged more than one with breaking changes the agent fixed.
 
 ## Specifications and Knowledge Management
 
@@ -180,7 +180,7 @@ A retro Skill reads the transcript of a finished session, finds where the agent 
 - [LangChain: The Anatomy of an Agent Harness](https://www.langchain.com/blog/the-anatomy-of-an-agent-harness)
 - [Sebastian Raschka: Components of a Coding Agent](https://magazine.sebastianraschka.com/p/components-of-a-coding-agent)
 
-## Security, Maintenance, and Policy
+## Security and Policy
 
 ### 25. Security Review and Threat Modeling
 
@@ -194,13 +194,7 @@ An agent can invent a package name that attackers then register with malware (sl
 
 **In practice:** you've caught or prevented a made-up or malicious dependency, and in your setup untrusted input can't reach a destructive action without an approval.
 
-### 27. Dependency Management
-
-Teams postpone upgrades and security patches, and known CVEs accumulate. An agent reads the changelog, updates the call sites, and runs the tests in a loop. Run it unattended (#19): Renovate or Dependabot opens the PR, the agent fixes the breaking changes, and a human reviews the draft.
-
-**In practice:** you've shipped a dependency-upgrade PR where AI handled the breaking changes, applied a security patch with AI triaging the CVE, or used AI to read changelogs and flag breaks early, and Dependabot, Renovate, or Snyk opens upgrade PRs that an agent then fixes.
-
-### 28. AI Usage Policy
+### 27. AI Usage Policy
 
 Use only the AI tools, models, MCP servers, and Skills your company has approved, with the data the policy allows. The policy covers everyone who builds with agents, and the team's setup enforces it through enterprise accounts, managed settings, and organization-level policies.
 
