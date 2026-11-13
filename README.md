@@ -20,25 +20,25 @@ This roadmap helps engineering teams build an efficient work process with AI age
 
 ### 1. AI Usage Policy
 
-Only the AI tools, models, MCP servers, and Skills the company has approved are in use, with the data the policy allows. The policy covers everyone who builds with agents, and enterprise accounts, managed settings, and organization-level policies enforce it.
+The team must follow the company's AI use policy and use only the AI tools, models, MCP servers, and Skills the company has approved, with the data the policy allows. The policy applies to everyone who builds with agents. Enterprise accounts, managed settings, and organization-level policies enforce it.
 
 **In practice:** the team has the approved list of AI tools, models, MCP servers, and data in one place every builder can find, and the managed settings and enterprise accounts that enforce it.
 
 ### 2. Product Exploration
 
-Agents answer architecture and workflow questions from the code: "How does feature X work?", "Which services handle a checkout request?". They generate a repository map, a tech stack summary, and component diagrams on demand.
+The team uses agents to learn how the product works from its code, with questions like "How does feature X work?" or "Which services handle a checkout request?". Agents also generate a repository map, a tech stack summary, and component diagrams on demand.
 
 **In practice:** the team has a generated repository map, tech stack summary, or component diagram, and a saved session with architecture questions answered from the code.
 
 ### 3. Agent Instructions
 
-Instructions checked into the repo give every agent the same starting context. The main file is a short table of contents that points to the docs a task needs, scoped to the directory or workflow they apply to. A rule is added after an agent failure that was observed, since stale or conflicting rules reduce reliability. An owner deletes rules that no longer hold.
+The team keeps agent instructions in the repo, so every agent starts with the same context. The main file is short and works as a table of contents that links to the docs a task needs. Smaller files cover a single directory or workflow. The team adds a rule only after it sees an agent fail, because stale or conflicting rules make agents less reliable. One owner removes rules that no longer apply.
 
 **In practice:** the team has an AGENTS.md, CLAUDE.md, Copilot instructions, or similar file in the repo that links to the deeper docs, a named owner, and a commit history that shows rules removed as well as added.
 
 ### 4. Sandboxing and Permissions
 
-Agents run in a dev container, VM, cloud sandbox, or an OS-level sandbox like sandbox-runtime, with scoped credentials, limited write paths, and a network allowlist. Autonomy grows gradually: low-risk commands and paths are allowed, budgets are set, and privileges, production, publishing, and deleting keep an approval. The permission config is checked into the repo. Session logs are retained, since later practices use them as evidence. [Claude Code](https://code.claude.com/docs/en/security), [Codex](https://developers.openai.com/codex/agent-approvals-security), and [Copilot](https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-cloud-agent) document their controls.
+Agents run in a dev container, VM, cloud sandbox, or an OS-level sandbox like sandbox-runtime, with scoped credentials, limited write paths, and a network allowlist. The team gives agents more autonomy step by step: low-risk commands and paths run without a prompt, each run has a budget, and privileges, production, publishing, and deleting still need approval. The permission config lives in the repo. The team keeps session logs, because later practices use them as evidence. [Claude Code](https://code.claude.com/docs/en/security), [Codex](https://developers.openai.com/codex/agent-approvals-security), and [Copilot](https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-cloud-agent) document their controls.
 
 **In practice:** the team has a checked-in permission config where low-risk commands need no prompt and production, publishing, and deleting need approval, the sandbox setup, and retained session logs as the audit trail of each run.
 
@@ -46,31 +46,31 @@ Agents run in a dev container, VM, cloud sandbox, or an OS-level sandbox like sa
 
 ### 5. Agentic Loop
 
-The agent receives an outcome, acceptance criteria, and the checks it must pass, then iterates on its own: change, build, lint, test, read failures, fix. Build, lint, and tests run from one command with the same result every run and finish in minutes. Lint and test failures state the fix, so the agent gets the remedy with the error. An iteration limit stops runaway loops. Edits to tests, snapshots, and check configuration are reviewed, since an agent that cannot pass a check sometimes changes the check.
+The team gives the agent an outcome, acceptance criteria, and the checks it must pass. The agent then works on its own: it changes code, builds, lints, tests, reads the failures, and fixes them. One command runs build, lint, and tests in minutes and gives the same result every time. Lint and test errors say how to fix the problem, so the agent gets the fix together with the error. An iteration limit stops a loop that goes nowhere. The team reviews any edits to tests, snapshots, and check configuration, because an agent that cannot pass a check sometimes changes the check.
 
 **In practice:** the team has one checked-in command for build, lint, and tests, an iteration limit in the agent config, and session logs where the agent ran from brief to passing checks with no human message in between.
 
 ### 6. Hook-Enforced Guardrails
 
-Guardrails do not depend on the agent following an instruction. Hooks run inside the session on each tool call: they block forbidden commands by pattern, run formatters and fast checks after edits, and keep a task open until the required checks pass. The same checks run in CI (#16), since a hook covers only the agents that load it. [Claude Code hooks](https://code.claude.com/docs/en/hooks) and [Codex hooks](https://developers.openai.com/codex/hooks) provide them.
+Guardrails must work even when the agent ignores an instruction. Hooks run inside the session on every tool call: they block forbidden commands, run formatters and fast checks after edits, and keep a task open until the required checks pass. The same checks also run in CI (#16), since only agents that load a hook get its protection. [Claude Code hooks](https://code.claude.com/docs/en/hooks) and [Codex hooks](https://developers.openai.com/codex/hooks) provide them.
 
 **In practice:** the team has at least one hook in version control that blocks a forbidden action or runs a formatter, linter, test, or audit after the agent's changes, and the same check in CI.
 
 ### 7. Requirements-Based Testing
 
-Agents write unit, integration, contract, and E2E tests from the requirements and observed behavior, never from the code they just wrote, because a test that mirrors the implementation hides the same bug. Mutation testing hardens the tests. Fixtures use fake or masked data only.
+Agents write unit, integration, contract, and E2E tests from the requirements and the observed behavior, never from the code they just wrote. A test that mirrors the implementation hides the same bug. Mutation testing shows whether the tests can actually fail. Fixtures use only fake or masked data.
 
 **In practice:** the team has merged PRs with tests that name the requirement or spec they cover, fixtures generated by the agent, and a mutation testing report or a recorded bug those tests caught.
 
 ### 8. Browser and Device Verification
 
-An agent that changes a UI checks the result in the running app through Playwright MCP, Chrome DevTools MCP, or a simulator: it clicks through the flow and reads console and network errors before it reports the task as done. The app starts from one command per working copy, with its own ports and database. Checks worth repeating become Playwright or Maestro scripts in CI. Vision-based computer control is used only where no DOM or accessibility API is available.
+When an agent changes a UI, it checks the result in the running app with Playwright MCP, Chrome DevTools MCP, or a simulator. It clicks through the flow and reads console and network errors before it reports the task as done. One command starts the app for each working copy, with its own ports and database. Checks worth repeating become Playwright or Maestro scripts in CI. The team uses vision-based computer control only where there is no DOM or accessibility API.
 
 **In practice:** the team has Playwright MCP, Chrome DevTools MCP, or a simulator in the agent config, a start command that runs the app per working copy, PRs whose agent runs include browser screenshots or traces, and Playwright or Maestro scripts in CI.
 
 ### 9. Evidence-Based Troubleshooting
 
-Agents troubleshoot from the actual logs, traces, CI output, and database schemas. Access is scoped and read-only or throwaway by default, secrets and personal data are stripped before they reach the model, and production writes and migrations need an explicit approval. Sentry and Grafana expose telemetry to agents; DBHub gives scoped database access.
+Agents troubleshoot from real logs, traces, CI output, and database schemas. By default their access is scoped and read-only, or works on a throwaway copy. The team strips secrets and personal data before they reach the model, and production writes and migrations need explicit approval. Sentry and Grafana expose telemetry to agents; DBHub gives scoped database access.
 
 **In practice:** the team has a scoped read-only credential or MCP server config for logs, traces, and the database, and a resolved incident or merged fix where the agent's diagnosis cites the actual log or trace.
 
@@ -78,19 +78,19 @@ Agents troubleshoot from the actual logs, traces, CI output, and database schema
 
 ### 10. Spec-Driven Development
 
-The spec is the source of truth: a Markdown file in the repo that humans and agents evolve together, and the code follows it. A feature spec covers the happy path, error and edge cases, acceptance criteria, and the design decisions with the options considered. Specs stay short and grow with the work, since an exhaustive design document slows delivery. Agents keep nothing between sessions and lose track as the context fills, so every session loads the spec at the start. For a task, the agent derives a plan with acceptance criteria from the spec and edits nothing until the plan is approved. The spec is updated when code or tests prove the design wrong. Spec Kit, Kiro, Tessl, and BMAD-METHOD give this a repeatable flow.
+The spec is the source of truth. It is a Markdown file in the repo that humans and agents change together, and the code follows it. A feature spec covers the happy path, error and edge cases, acceptance criteria, and the design decisions with the options considered. Specs stay short and grow with the work, because a long design document slows delivery. Agents remember nothing between sessions and lose track as the context fills, so every session starts by loading the spec. For each task, the agent writes a plan with acceptance criteria from the spec and changes no code until someone approves the plan. When code or tests prove the design wrong, the team updates the spec. Spec Kit, Kiro, Tessl, and BMAD-METHOD give this a repeatable flow.
 
 **In practice:** the team has Markdown specs in the repo with the happy path, error cases, acceptance criteria, and design decisions, a commit history that shows them changing with the code, an agent instruction that loads the spec at session start, and approved plans the agent derived from specs before editing.
 
 ### 11. Architecture Governance
 
-The rules the code must follow live in the repo: a reference architecture, coding standards, and an ADR for every non-trivial decision. Rules that code can check run as structural tests and custom lint rules, and an agent review covers the rest (#16). Agents read the rules before a change and update the ADR in the same PR. A scheduled check (#20) flags rules the code no longer follows.
+The repo holds the rules the code must follow: a reference architecture, coding standards, and an ADR for every non-trivial decision. Structural tests and custom lint rules enforce what code can check, and an agent review covers the rest (#16). Agents read the rules before a change and update the ADR in the same PR. A scheduled check (#20) flags rules the code no longer follows.
 
 **In practice:** the team has a reference architecture and ADRs in the repo, structural tests or lint rules that enforce them, plans that cite them, and at least one agent diff a conformance check rejected.
 
 ### 12. Project Knowledge Base
 
-One searchable knowledge base holds the product context that specs (#10) and ADRs (#11) do not: vision and roadmap, current priorities, API references, and onboarding guides. Agent instructions link to it (#3), and MCP exposes it (#14) when it lives outside the repo. The agent updates the pages a change affects in the same PR, and a scheduled check (#20) flags stale pages. DORA lists [AI-accessible internal documentation](https://dora.dev/ai/roi/report/) as a foundation for return on AI.
+Agents drift away from the product when they lack its context. One searchable knowledge base holds what specs (#10) and ADRs (#11) do not: the vision and roadmap, current priorities, API references, and onboarding guides. Agent instructions link to it (#3), and an MCP server exposes it (#14) when it lives outside the repo. The agent updates the pages a change affects in the same PR, and a scheduled check (#20) flags stale pages. DORA lists [AI-accessible internal documentation](https://dora.dev/ai/roi/report/) as a foundation for return on AI.
 
 **In practice:** the team has a knowledge base with vision, priorities, API references, and onboarding guides, the agent instruction or MCP config that reaches it, and the output of the stale-page check.
 
@@ -98,19 +98,19 @@ One searchable knowledge base holds the product context that specs (#10) and ADR
 
 ### 13. Workflow Skills
 
-A Skill turns a repeated workflow into something every agent on the team runs the same way: a SKILL.md the agent loads only when the task needs it, in an open format that works across agents. Teams write their own for build steps, scaffolding, and PR prep, load reviewed third-party Skills such as Context7 or Superpowers, pin them, and skip large frameworks unless they clearly beat a simpler setup.
+A Skill turns a repeated workflow into steps every agent on the team runs the same way. It is a SKILL.md file the agent loads only when a task needs it, in an open format that works across agents. The team writes its own Skills for build steps, scaffolding, and PR prep. It also loads reviewed third-party Skills such as Context7 or Superpowers, pins their versions, and skips large frameworks unless they clearly beat a simpler setup.
 
 **In practice:** the team has a SKILL.md it wrote and uses, a pinned list of external Skills, and a record of one Skill evaluated and rejected.
 
 ### 14. MCP Integrations
 
-MCP connects an agent to data and external systems through an open standard. A CLI, a script, or a Skill is often simpler and cheaper in tokens, so MCP is used where a structured tool contract, an auth boundary, or shared access is needed. Every server runs as code with the team's access: servers from the approved list (#1) only, pinned versions, unused tools and scopes turned off, and destructive actions behind an approval (#4).
+MCP connects agents to data and external systems through an open standard. A CLI, a script, or a Skill is often simpler and uses fewer tokens, so the team uses MCP when it needs a structured tool contract, an auth boundary, or shared access. Every MCP server runs with the team's access, so the team treats it as code it runs: only servers from the approved list (#1), pinned versions, unused tools and scopes turned off, and approval for destructive actions (#4).
 
 **In practice:** the team has an MCP server config with pinned versions and disabled scopes, the credentials and permissions documented per server, and a record of one case where a CLI or Skill was chosen over MCP.
 
 ### 15. Code Intelligence
 
-Agents resolve symbols, types, and references through a language server, AST tools, and semantic search instead of text search, which misses call sites and invents APIs. On very large repos, a code graph of functions, imports, and call chains, queried over MCP, answers "what calls this?" in a few hundred tokens. CodeGraph, Potpie, and codebase-memory-mcp build such graphs; Serena exposes language-server tools over MCP.
+Text search misses call sites and leads agents to invent APIs. Agents use a language server, AST tools, and semantic search to resolve symbols, types, and references. On very large repos, a code graph of functions, imports, and call chains answers "what calls this?" over MCP in a few hundred tokens. CodeGraph, Potpie, and codebase-memory-mcp build such graphs; Serena exposes language-server tools over MCP.
 
 **In practice:** the team has a language server, semantic search, or AST tool in the agent config, a prebuilt code graph for repos too big for grep-and-read, and measured token or tool-call savings.
 
@@ -118,19 +118,19 @@ Agents resolve symbols, types, and references through a language server, AST too
 
 ### 16. Automated Verification
 
-Review and QA run as automated layers before a human sees a diff. Deterministic layer: CI the agent cannot edit, static analysis, structural tests (#11), contract and E2E tests, branch protection. Agent layer, run by a context that did not write the code: diff review against the spec (#10), conformance review against the ADRs (#11), coverage check of the tests against the requirements (#7). The reviewer agent is calibrated against human review and kept only where evals (#24) show it catches defects. Human review is removed per category of change, once the defect log shows the automated layers catch what reviewers catch. Target state: production releases from a verification setup the team trusts without human review.
+Automated review and QA run in layers before a human sees a diff. The deterministic layer is CI the agent cannot edit, static analysis, structural tests (#11), contract and E2E tests, and branch protection. In the agent layer, a context that did not write the code reviews the diff against the spec (#10), checks it against the ADRs (#11), and checks that the tests cover the requirements (#7). The team calibrates the reviewer agent against human reviews and keeps it only where evals (#24) show it catches defects. The team drops human review one category of change at a time, once the defect log shows that the automated layers catch what human reviewers catch. The goal is to release to production with a verification setup the team trusts without human review.
 
 **In practice:** the team has branch protection and CI config the agent cannot edit, configured spec, architecture, and test-coverage reviewers, a defect log per layer that includes defects found after merge, a written rule for which changes merge without human review, and session logs where a feature went from brief to merged through automated review and QA with no human interaction.
 
 ### 17. Security Review and Threat Modeling
 
-AI traces trust boundaries and suggests abuse paths for the authorization gaps, injection points, and exposed secrets that code review and tests miss. Findings are confirmed with [Codex Security](https://developers.openai.com/codex/security), CodeQL, Semgrep, and targeted tests.
+Code review and tests often miss authorization gaps, injection points, and exposed secrets. The team uses AI to trace trust boundaries and suggest abuse paths, then confirms the findings with [Codex Security](https://developers.openai.com/codex/security), CodeQL, Semgrep, and targeted tests.
 
 **In practice:** the team has a security review or threat-model report on a meaningful feature or diff, and the fix, test, or written risk acceptance that followed.
 
 ### 18. Supply Chain and Prompt Injection Defense
 
-Suggested dependencies are checked to exist and be the right package, then pinned and scanned, since an agent can invent a package name that attackers register with malware (slopsquatting) or pull in a compromised dependency. Untrusted content such as web pages, issues, and MCP tool results cannot trigger a tool that writes, publishes, or deletes without approval (#4).
+An agent can invent a package name that attackers then register with malware (slopsquatting), or pull in a compromised dependency. The team checks that every suggested dependency exists and is the right package, then pins and scans it. Untrusted content such as web pages, issues, and MCP tool results must not trigger a tool that writes, publishes, or deletes without approval (#4).
 
 **In practice:** the team has dependency verification and scanning in CI, a test that shows untrusted content cannot trigger a destructive action, and a record of a made-up or malicious dependency caught.
 
@@ -138,31 +138,31 @@ Suggested dependencies are checked to exist and be the right package, then pinne
 
 ### 19. Long-Running Execution
 
-A run that lasts hours is the agentic loop (#5) with state that survives the session. The run has a turn or token budget, a stop condition, and a definition of progress. Sessions end through crashes and handoffs, so the state lives in a progress file the agent updates and re-reads, and a new session starts with a clean context and a clear handoff instead of a summarized history.
+A run that lasts hours is the agentic loop (#5) with state that outlives the session. It has a turn or token budget, a stop condition, and a definition of progress. Sessions end through crashes and handoffs, so the agent keeps its state in a progress file that it updates and re-reads. A new session starts with a clean context and a clear handoff, instead of a summary of the old chat.
 
 **In practice:** the team has the budget and stop condition in the run config, a progress file the agent updated across sessions, and session logs with duration of a long or multi-session run that finished without manual intervention.
 
 ### 20. Background and Cloud Delegation
 
-Background and cloud agents take a brief and return a PR, or run on a schedule or repo event to triage issues, investigate failing CI, or open maintenance PRs (#21). Only work the team can verify is delegated. On [GitHub Copilot](https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-automations), [Codex cloud](https://developers.openai.com/codex/app/automations), Cursor, or Claude Code on the web, each unattended run is sandboxed (#4), narrow in scope, budget-limited, and ends in a draft that goes through verification (#16).
+Background and cloud agents take a brief and return a PR. They also run on a schedule or a repo event to triage issues, investigate failing CI, or open maintenance PRs (#21). The team delegates only work it can verify. On [GitHub Copilot](https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-automations), [Codex cloud](https://developers.openai.com/codex/app/automations), Cursor, or Claude Code on the web, every unattended run is sandboxed (#4), narrow in scope, and has a budget, and it ends in a draft that goes through verification (#16).
 
 **In practice:** the team has the schedule or event trigger config of at least one unattended agent, and the draft PRs, issue updates, or reports it produced, with their verification record before merge or release.
 
 ### 21. Maintenance Automation
 
-Code analysis and code graph tools (#15) measure codebase health, and the findings feed a technical debt backlog. A scheduled agent (#20) works the backlog: refactoring PRs, codemod runs with ast-grep, GritQL, jscodeshift, or Comby, and framework, dependency, and security-patch upgrades opened by Renovate, Dependabot, or Snyk. The agent reads the changelog, updates the call sites, and runs the tests. The PRs merge under the review rule in #16.
+Code analysis and code graph tools (#15) measure the health of the codebase, and their findings go into a technical debt backlog. A scheduled agent (#20) works through the backlog: it opens refactoring PRs, runs codemods with ast-grep, GritQL, jscodeshift, or Comby, and fixes the framework, dependency, and security-patch upgrades that Renovate, Dependabot, or Snyk open. For an upgrade, the agent reads the changelog, updates the call sites, and runs the tests. The PRs merge under the review rule in #16.
 
 **In practice:** the team has a technical debt backlog fed by code analysis, the schedule config of the maintenance agent, and merged refactoring, upgrade, and security-patch PRs it opened.
 
 ### 22. Parallel Execution
 
-Each parallel agent works in isolation. A worktree gives it its own checkout and branch, and databases, ports, credentials, and caches get their own boundaries, which Portless or Aspire's isolated mode provide. Each agent has one goal, a defined output, and files no other agent edits. Before merging, each branch is rebased, the full checks run, and the result goes through verification (#16). The number of parallel agents stays within what the team can review.
+Each parallel agent works in isolation. A worktree gives it its own checkout and branch, and Portless or Aspire's isolated mode give it its own databases, ports, credentials, and caches. Each agent has one goal, a defined output, and files no other agent edits. Before merging, the team rebases each branch, runs the full checks, and sends the result through verification (#16). The team runs only as many parallel agents as it can review.
 
 **In practice:** the team has a worktree or cloud setup for parallel agents with isolated ports and databases, merged branches from parallel runs, and a record of one task where the split saved time and one where it did not.
 
 ### 23. Agent Hierarchies
 
-A lead agent splits a goal from the spec (#10) into tasks that each fit one context window, dispatches worker sub-agents (#22), and routes their output through verification (#16). Handoff chains between agents stay short, since long chains fail more often. Humans set intent through specs and budgets and step in on failures, escalations, and anomalies. Every run has a trace (#24) and hard limits on cost and blast radius (#4). The [Steps of AI Adoption](https://claude.ai/code/artifact/bfdfaef9-bc62-4dfe-ba9e-c58a26c9accf) classification maps the path from one supervised agent to hundreds.
+A lead agent splits a goal from the spec (#10) into tasks that each fit one context window, hands them to worker sub-agents (#22), and routes their output through verification (#16). Handoff chains between agents stay short, because long chains fail more often. Humans set the intent through specs and budgets and step in on failures, escalations, and anomalies. Every run has a trace (#24) and hard limits on cost and blast radius (#4). The [Steps of AI Adoption](https://claude.ai/code/artifact/bfdfaef9-bc62-4dfe-ba9e-c58a26c9accf) classification maps the path from one supervised agent to hundreds.
 
 **In practice:** the team has a lead-agent run that dispatched worker and reviewer sub-agents from one spec, a trace or dashboard covering every run, and an escalation record handled instead of a diff-by-diff review.
 
@@ -170,25 +170,25 @@ A lead agent splits a goal from the spec (#10) into tasks that each fit one cont
 
 ### 24. Traces and Evals
 
-Traces record what each run did: tool calls, Skills loaded, hook blocks, iterations, and tokens, exported over OpenTelemetry or written to a log. Evals measure how well the agent workflow (instructions, Skills, tools, and model) completes tasks. A dataset of 20 to 50 tasks built from real work and past failures re-runs whenever the model, prompts, or tools change. Agent behavior varies between runs, so results are compared across several runs. On every model release the harness is re-examined, and parts are removed one at a time to see which still help.
+Traces record what each run did: tool calls, Skills loaded, hooks that blocked an action, iterations, and tokens. The harness exports them over OpenTelemetry or writes them to a log. Evals measure how well the agent workflow completes tasks, meaning its instructions, Skills, tools, and model. The team keeps 20 to 50 tasks from real work and past failures and re-runs them whenever the model, prompts, or tools change. Agents behave differently from run to run, so the team compares results across several runs. When a new model ships, the team reviews the harness and removes parts one at a time to see which still help.
 
 **In practice:** the team has traces with tool, Skill, and hook events for its runs, an eval dataset built from real tasks and failures, results across several runs, and a regression the evals caught or a harness part they showed was no longer needed.
 
 ### 25. Token Economics
 
-Tokens are the cost unit of agent work, and a full context window also lowers recall, so what the model sees and what it costs are managed together. Instructions stay short and the toolset small, information is fetched only when needed, command output is filtered, and prompt caching and model routing are in use. The measure is task success per token, with a known budget and usage visible per tool, since parallel agents multiply spend. Compression tools like Headroom and RTK help, with task quality checked as well as token savings.
+Tokens are the cost unit of agent work, and a full context window also lowers recall, so the team manages what the model sees and what it costs together. Instructions stay short and the toolset small, agents fetch information only when they need it, hooks filter command output, and prompt caching and model routing are on. The measure is task success per token. The team knows its budget and sees usage per tool, since parallel agents multiply spend. Compression tools like Headroom and RTK help, and the team checks task quality as well as token savings.
 
 **In practice:** the team has a token budget, a usage view per tool, and before-and-after measurements of cost, latency, and task success for at least one context change.
 
 ### 26. Session Retros
 
-A retro Skill reads the transcript of a finished session, finds where the agent lost time or made mistakes, and proposes a harness change for each finding: an instruction (#3), a lint rule or test, a hook (#6), a Skill update (#13), a tool change, or wider read access. Nothing is written until a proposal is approved. A mechanical mistake gets an automated check rather than a new instruction. Every change records the failure that justifies it and is removed when it stops applying. Retros run after a long or difficult session, and a cross-session review runs every month. [Matt Pocock's `/retro`](https://www.aihero.dev/skills-retro) reviews one session; [retro-skill](https://github.com/netresearch/retro-skill) adds cross-session audits and checks whether past work was later reverted or failed CI.
+A retro Skill reads the transcript of a finished session, finds where the agent lost time or made mistakes, and proposes a harness change for each finding: an instruction (#3), a lint rule or test, a hook (#6), a Skill update (#13), a tool change, or wider read access. Nothing changes until someone approves a proposal. A mechanical mistake gets an automated check rather than a new instruction. Each change records the failure that justified it, and the team removes it when it no longer applies. The team runs a retro after a long or difficult session, and a cross-session review every month. [Matt Pocock's `/retro`](https://www.aihero.dev/skills-retro) reviews one session; [retro-skill](https://github.com/netresearch/retro-skill) adds cross-session audits and checks whether past work was later reverted or failed CI.
 
 **In practice:** the team has retro output from real sessions, the approved changes to instructions, checks, hooks, or Skills it produced, each with the failure that justified it, and a later session log without the same problem.
 
 ### 27. Delivery Metrics
 
-The work process is measured by its delivery outcomes: lead time for changes, change failure rate, the revert rate of agent-written PRs, and the share of PRs merged without human edits. The numbers come from the issue tracker, the repo, and CI, with a baseline taken before a harness change. They are read together with token cost (#25) and eval results (#24), since a faster or cheaper process that ships more defects is a regression.
+The team measures its work process by delivery outcomes: lead time for changes, change failure rate, the revert rate of agent-written PRs, and the share of PRs merged without human edits. The numbers come from the issue tracker, the repo, and CI, with a baseline taken before each harness change. The team reads them together with token cost (#25) and eval results (#24), because a faster or cheaper process that ships more defects is a step back.
 
 **In practice:** the team has a report with lead time, change failure rate, and revert rate of agent-written PRs, a baseline from before the last harness change, and a harness decision that these numbers led to.
 
