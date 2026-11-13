@@ -216,6 +216,7 @@ The work process is measured by its delivery outcomes: lead time for changes, ch
 - [Cline](https://cline.bot/) - Open-source coding agent.
 - [OpenCode](https://github.com/anomalyco/opencode) - Open-source coding agent for the terminal, desktop, and IDE.
 - [Orbi](https://github.com/orbi-build/orbi) - Open-source runner that takes a labeled GitHub issue to a pull request, gates the merge on an independent review session against the acceptance criteria, and cuts the tagged release.
+- [mu](https://github.com/qybaihe/mu) - Open-source coding agent built on pi in which a small judge model answers bounded questions at 40 decision points in the agent loop, such as which tool output enters the context and whether "done" was verified.
 
 ### Sandboxes and permissions
 
