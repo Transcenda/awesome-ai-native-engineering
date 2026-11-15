@@ -251,6 +251,7 @@ The team measures its work process by delivery outcomes: lead time for changes, 
 - [Grafana MCP](https://github.com/grafana/mcp-grafana) - Grafana's official MCP server for dashboards, metrics, logs, and alerts.
 - [Datadog MCP Server](https://docs.datadoghq.com/bits_ai/mcp_server/) - Datadog's MCP server for querying monitors, logs, traces, and metrics.
 - [Spike](https://spike.sh) - Incident management and on-call platform with a remote MCP server for AI agents.
+- [No Stairs Please MCP](https://nostairsplease.com/mcp) - Remote MCP server exposing live-music venue data, booking contacts, and route search for AI agents.
 
 ### Database and data
 
